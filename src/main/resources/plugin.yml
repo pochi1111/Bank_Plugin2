@@ -1,0 +1,26 @@
+name: Bank_Plugin2
+version: '${project.version}'
+main: san.kuroinu.bank_plugin2.Bank_Plugin2
+api-version: 1.19
+depend:
+  - Vault
+commands:
+  atm:
+    description: "お財布から現金を取り出したり入れたりします"
+    usage: "/atm <in/out>"
+  deposit:
+    description: "お財布から銀行に預けます"
+    usage: "/deposit <金額>"
+  withdraw:
+    description: "銀行からお財布に引き出します"
+    usage: "/withdraw <金額>"
+  bank:
+    description: "銀行やお財布の残高を確認します"
+    usage: "/bank"
+    aliases:
+      - balance
+      - money
+
+  pay:
+    description: "他のプレイヤーにお金を送ります"
+    usage: "/pay <プレイヤー名> <金額>"

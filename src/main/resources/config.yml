@@ -1,0 +1,5 @@
+mysql:
+  url: "jdbc:mysql://localhost:3306/plugin_db"
+  user: "root"
+  password: "password"
+wallet_cmd: 0
