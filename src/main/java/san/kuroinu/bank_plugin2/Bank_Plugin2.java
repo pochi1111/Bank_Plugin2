@@ -29,13 +29,15 @@ public final class Bank_Plugin2 extends JavaPlugin {
     public static ArrayList<String> atm_select_players = new ArrayList<>();
     public static ArrayList<String> atm_out_players = new ArrayList<>();
     public static Economy econ = null;
-    public static NamespacedKey money_key = new NamespacedKey(plugin, "money");
+    public static NamespacedKey money_key;
     public static ArrayList<Pair<String,String>> pay_cooltime_players = new ArrayList<>();
 
     @Override
     public void onEnable() {
         // Plugin startup logic
         plugin = this;
+        plugin.saveDefaultConfig();
+        money_key = new NamespacedKey(plugin,"money");
         super.onEnable();
         // vaultの導入確認
         if (!setupEconomy() ) {
@@ -51,7 +53,7 @@ public final class Bank_Plugin2 extends JavaPlugin {
         ds = new HikariDataSource(conf);
         //コマンドを登録
         getCommand("atm").setExecutor(new atm());
-        getCommand("depoit").setExecutor(new deposit());
+        getCommand("deposit").setExecutor(new deposit());
         getCommand("withdraw").setExecutor(new withdraw());
         getCommand("bank").setExecutor(new bank());
         getCommand("pay").setExecutor(new pay());
