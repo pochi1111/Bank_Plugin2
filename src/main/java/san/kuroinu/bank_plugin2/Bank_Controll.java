@@ -9,20 +9,23 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import static san.kuroinu.bank_plugin2.Bank_Plugin2.ds;
-import static san.kuroinu.bank_plugin2.Bank_Plugin2.prefix;
+import static san.kuroinu.bank_plugin2.Bank_Plugin2.*;
 
 public class Bank_Controll {
     public OfflinePlayer e;
     private static int balance;
     public int bank_balance(){
-        new Thread(()->{
+        Thread t;
+        t = new Thread(()->{
             try {
                 Connection con = ds.getConnection();
+                plugin.getServer().getConsoleSender().sendMessage(prefix+ChatColor.YELLOW+e.getName()+"の銀行残高を取得します");
                 PreparedStatement ps = con.prepareStatement("SELECT * FROM db_money WHERE uuid = '"+e.getUniqueId()+"'");
                 ResultSet rs = ps.executeQuery();
                 if (rs.next()){
                     balance = rs.getInt("money");
+                    //logを出力
+                    plugin.getServer().getConsoleSender().sendMessage(prefix+ChatColor.YELLOW+e.getName()+"の銀行残高は"+balance+"円です");
                 }else{
                     make_bank();
                     balance = 0;
@@ -33,7 +36,13 @@ public class Bank_Controll {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-        }).start();
+        });
+        t.start();
+        try {
+            t.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         return balance;
     }
 

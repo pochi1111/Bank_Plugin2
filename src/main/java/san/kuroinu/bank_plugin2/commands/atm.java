@@ -44,15 +44,15 @@ public class atm implements CommandExecutor, TabCompleter {
             atm_select_players.add(e.getName());
             return true;
         }
-        if (args[0] == "help"){
+        if (args[0].equals("help")){
             atmhelp(e);
         }
-        if (args[0] == "in"){
+        if (args[0].equals("in")){
             //お財布に入れるインベントリを表示
             Inventory inv = plugin.getServer().createInventory(null, 27, prefix+"現金を入れてください");
             e.openInventory(inv);
             atm_open_players.add(e.getName());
-        }else if (args[0] == "out"){
+        }else if (args[0].equals("out")){
             if (args.length >= 3){
                 //2コメと3こめが整数かどうか
                 int money;
@@ -62,6 +62,11 @@ public class atm implements CommandExecutor, TabCompleter {
                     amount = Integer.parseInt(args[2]);
                 }catch (NumberFormatException ex){
                     e.sendMessage(prefix + "金額と個数は整数で入力してください");
+                    return true;
+                }
+                //money,amountが1以上か
+                if (money <= 1 || amount <= 1){
+                    e.sendMessage(prefix + "金額と個数は1以上で入力してください");
                     return true;
                 }
                 //money*amount以上のお金を持っているか
@@ -78,6 +83,7 @@ public class atm implements CommandExecutor, TabCompleter {
                             empty++;
                         }
                     }
+                    int tmp = amount;
                     if (amount%64 == 0){
                         amount /= 64;
                     }else{
@@ -88,10 +94,11 @@ public class atm implements CommandExecutor, TabCompleter {
                         return true;
                     }
                     //お金をインベントリに入れる
-                    ItemStack wallet = createwallet(amount, money);
+                    ItemStack wallet = createwallet(tmp, money);
                     inv.addItem(wallet);
+                    econ.withdrawPlayer(e, money*tmp);
                 }
-            }else if (args.length == 0){
+            }else if (args.length == 1){
                 //お金を出すGUIを表示させる
                 Inventory inv = plugin.getServer().createInventory(null, 27, prefix+"現金を出してください");
                 for (int i = 0; i < 9; i++) {
@@ -110,7 +117,7 @@ public class atm implements CommandExecutor, TabCompleter {
                 inv.setItem(16,createwallet(1, 500000));
                 inv.setItem(17,createwallet(1, 1000000));
                 e.openInventory(inv);
-                atm_open_players.add(e.getName());
+                atm_out_players.add(e.getName());
             }else{
                 atmhelp(e);
             }
@@ -128,10 +135,22 @@ public class atm implements CommandExecutor, TabCompleter {
     }
 
     ItemStack createwallet(int amount, int money){
-        ItemStack item = new ItemStack(Material.YELLOW_DYE, amount);
+        //100円以下なら黄色の染料、1000円以下なら鉄、１００００まんえん以下ならダイヤ、それ以上ならエメラルド
+        Material material;
+        if (money <= 100){
+            material = Material.YELLOW_DYE;
+        }else if (money <= 1000){
+            material = Material.IRON_INGOT;
+        }else if (money <= 10000){
+            material = Material.DIAMOND;
+        }else{
+            material = Material.EMERALD;
+        }
+        ItemStack item = new ItemStack(material, amount);
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(ChatColor.YELLOW + "お金");
         meta.setLore(Collections.singletonList(money+"円"));
+        meta.setCustomModelData(plugin.getConfig().getInt("wallet_cmd"));
         //NBTに金額を入れる
         meta.getPersistentDataContainer().set(money_key, PersistentDataType.INTEGER, money);
         item.setItemMeta(meta);

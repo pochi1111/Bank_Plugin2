@@ -1,6 +1,7 @@
 package san.kuroinu.bank_plugin2.listeners;
 
 import com.destroystokyo.paper.event.player.PlayerConnectionCloseEvent;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -18,16 +19,19 @@ public class atm_select implements Listener {
         if (atm_select_players.contains(event.getWhoClicked().getName())){
             event.setCancelled(true);
             Player e = (Player) event.getWhoClicked();
-            ItemStack clickedItem = event.getCurrentItem();
-            if (clickedItem.getType() == null){
+            if (event.getClickedInventory() == null){
                 return;
             }
-            if (clickedItem.getType().equals(Material.HOPPER) && clickedItem.getItemMeta().getLore().equals("お金を入れます")){
+            ItemStack clickedItem = event.getCurrentItem();
+            if (clickedItem == null){
+                return;
+            }
+            if (clickedItem.getType().equals(Material.HOPPER) && clickedItem.getItemMeta().getDisplayName().equals(ChatColor.BOLD+"お金を入れる")){
                 atm_select_players.remove(e.getName());
                 e.closeInventory();
                 e.performCommand("atm in");
             }
-            if (clickedItem.getType().equals(Material.CHEST) && clickedItem.getItemMeta().getLore().equals("お金を出します")){
+            if (clickedItem.getType().equals(Material.CHEST) && clickedItem.getItemMeta().getDisplayName().equals(ChatColor.BOLD+"お金を出す")){
                 atm_select_players.remove(e.getName());
                 e.closeInventory();
                 e.performCommand("atm out");

@@ -30,7 +30,8 @@ public final class Bank_Plugin2 extends JavaPlugin {
     public static ArrayList<String> atm_out_players = new ArrayList<>();
     public static Economy econ = null;
     public static NamespacedKey money_key;
-    public static ArrayList<Pair<String,String>> pay_cooltime_players = new ArrayList<>();
+    public static ArrayList<ArrayList<String>> pay_cooltime_players = new ArrayList<>();
+    public static ArrayList<ArrayList<String>> lend_wait_players= new ArrayList<>();
 
     @Override
     public void onEnable() {
@@ -46,11 +47,7 @@ public final class Bank_Plugin2 extends JavaPlugin {
             return;
         }
         // mysqlの設定
-        HikariConfig conf = new HikariConfig();
-        conf.setJdbcUrl(plugin.getConfig().getString("mysql.url"));
-        conf.setUsername(plugin.getConfig().getString("mysql.user"));
-        conf.setPassword(plugin.getConfig().getString("mysql.password"));
-        ds = new HikariDataSource(conf);
+        db_config_relaod();
         //コマンドを登録
         getCommand("atm").setExecutor(new atm());
         getCommand("deposit").setExecutor(new deposit());
@@ -67,13 +64,15 @@ public final class Bank_Plugin2 extends JavaPlugin {
             try {
                 con = ds.getConnection();
                 //db_moneyテーブルがあるかどうか
-                if (con.prepareStatement("SHOW TABLES LIKE 'db_money'").executeQuery().next()){
-                    con.close();
-                }else{
+                if (!con.prepareStatement("SHOW TABLES LIKE 'db_money'").executeQuery().next()){
                     //ないなら作成
                     con.prepareStatement("create table db_money (id    int auto_increment primary key,uuid  text null,money int  null)").executeUpdate();
-                    con.close();
                 }
+                //debt_dbがあるかどうか
+                if (!con.prepareStatement("SHOW TABLES LIKE 'debt_db'").executeQuery().next()) {
+                    con.prepareStatement("create table debt_db(id int auto_increment primary key,debt_amount int  null,lender_uuid text null comment '貸す人のuuid',debtor_uuid text null comment '借りる人のuuid',debt_term date null);").executeUpdate();
+                }
+                con.close();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
@@ -109,5 +108,13 @@ public final class Bank_Plugin2 extends JavaPlugin {
         im.setLore(lore_list);
         i.setItemMeta(im);
         return i;
+    }
+
+    public static void db_config_relaod(){
+        HikariConfig conf = new HikariConfig();
+        conf.setJdbcUrl(plugin.getConfig().getString("mysql.url"));
+        conf.setUsername(plugin.getConfig().getString("mysql.user"));
+        conf.setPassword(plugin.getConfig().getString("mysql.password"));
+        ds = new HikariDataSource(conf);
     }
 }

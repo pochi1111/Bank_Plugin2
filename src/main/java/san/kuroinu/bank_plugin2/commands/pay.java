@@ -9,6 +9,8 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import san.kuroinu.bank_plugin2.Bank_Controll;
 
+import java.util.ArrayList;
+
 import static san.kuroinu.bank_plugin2.Bank_Plugin2.*;
 
 public class pay implements CommandExecutor {
@@ -35,13 +37,20 @@ public class pay implements CommandExecutor {
             p.sendMessage(prefix+ ChatColor.RED+"金額は数字で入力してください");
             return true;
         }
+        //1円以上か
+        if (amount < 1){
+            p.sendMessage(prefix+ ChatColor.RED+"1円以上の金額を入力してください");
+            return true;
+        }
         //お金があるか
         if (econ.getBalance(p) < amount){
             p.sendMessage(prefix+ ChatColor.RED+"お財布のお金が足りません");
             return true;
         }
         //クールダウンの人か
-        Pair<String, String> pair = new Pair<>(p.getName(), args[0]);
+        ArrayList<String> pair = new ArrayList<>();
+        pair.add(p.getName());
+        pair.add(args[0]);
         if (!pay_cooltime_players.contains(pair)){
             sender.sendMessage(prefix+ ChatColor.BOLD+ "=====[送金]=====");
             sender.sendMessage(prefix+ ChatColor.BOLD+"送る相手:"+args[0]);

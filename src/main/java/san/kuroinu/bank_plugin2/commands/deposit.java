@@ -30,6 +30,11 @@ public class deposit implements CommandExecutor {
             sender.sendMessage(prefix+"§c数字を入力してください");
             return true;
         }
+        //1円以上か
+        if (money<1){
+            sender.sendMessage(prefix+"§c1円以上を入力してください");
+            return true;
+        }
         Player e  = (Player) sender;
         //お金がお財布にあるかどうか
         if (econ.getBalance(e)<money){

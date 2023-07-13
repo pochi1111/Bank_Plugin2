@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
 
 import static san.kuroinu.bank_plugin2.Bank_Plugin2.*;
@@ -21,14 +22,11 @@ public class atm_close implements Listener{
             Inventory close_inv = event.getInventory();
             int money = 0;
             for (int i = 0; i < 27; i++){
-                if (close_inv.getItem(i) != null){
-                    //黄色の染料じゃないならskip
-                    if (!close_inv.getItem(i).getItemMeta().getPersistentDataContainer().has(money_key, PersistentDataType.INTEGER)){
-                        continue;
-                    }
+                ItemStack item = close_inv.getItem(i);
+                if (item != null){
                     //money_keyのPersistentDataContainerがあるならお金を入れる
-                    if (close_inv.getItem(i).getItemMeta().getPersistentDataContainer().has(money_key, PersistentDataType.INTEGER)){
-                        money += close_inv.getItem(i).getItemMeta().getPersistentDataContainer().get(money_key, PersistentDataType.INTEGER);
+                    if (item.getItemMeta().getPersistentDataContainer().has(money_key, PersistentDataType.INTEGER)){
+                        money += item.getItemMeta().getPersistentDataContainer().get(money_key, PersistentDataType.INTEGER)*item.getAmount();
                         close_inv.setItem(i, null);
                     }
                 }

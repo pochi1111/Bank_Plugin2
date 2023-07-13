@@ -32,6 +32,11 @@ public class withdraw implements CommandExecutor{
             sender.sendMessage(prefix+ChatColor.RED+"数字を入力してください");
             return true;
         }
+        //1円以上か
+        if (money<1){
+            sender.sendMessage(prefix+ChatColor.RED+"1円以上を入力してください");
+            return true;
+        }
         Player e  = (Player) sender;
         //お金が銀行にあるかどうか
         new Thread(()->{
