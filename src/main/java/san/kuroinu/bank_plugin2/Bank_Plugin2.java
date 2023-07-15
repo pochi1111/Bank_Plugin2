@@ -14,6 +14,7 @@ import san.kuroinu.bank_plugin2.commands.*;
 import san.kuroinu.bank_plugin2.listeners.atm_close;
 import san.kuroinu.bank_plugin2.listeners.atm_out;
 import san.kuroinu.bank_plugin2.listeners.atm_select;
+import san.kuroinu.bank_plugin2.listeners.lend_collect;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -30,6 +31,7 @@ public final class Bank_Plugin2 extends JavaPlugin {
     public static ArrayList<String> atm_out_players = new ArrayList<>();
     public static Economy econ = null;
     public static NamespacedKey money_key;
+    public static NamespacedKey lend_key;
     public static ArrayList<ArrayList<String>> pay_cooltime_players = new ArrayList<>();
     public static ArrayList<ArrayList<String>> lend_wait_players= new ArrayList<>();
 
@@ -39,6 +41,7 @@ public final class Bank_Plugin2 extends JavaPlugin {
         plugin = this;
         plugin.saveDefaultConfig();
         money_key = new NamespacedKey(plugin,"money");
+        lend_key = new NamespacedKey(plugin,"lend");
         super.onEnable();
         // vaultの導入確認
         if (!setupEconomy() ) {
@@ -54,10 +57,12 @@ public final class Bank_Plugin2 extends JavaPlugin {
         getCommand("withdraw").setExecutor(new withdraw());
         getCommand("bank").setExecutor(new bank());
         getCommand("pay").setExecutor(new pay());
+        getCommand("lendmoney").setExecutor(new lendmoney());
         //リスナーを登録
         getServer().getPluginManager().registerEvents(new atm_close(), this);
         getServer().getPluginManager().registerEvents(new atm_select(), this);
         getServer().getPluginManager().registerEvents(new atm_out(), this);
+        getServer().getPluginManager().registerEvents(new lend_collect(), this);
         //テーブルを作成
         new Thread(()->{
             Connection con = null;
