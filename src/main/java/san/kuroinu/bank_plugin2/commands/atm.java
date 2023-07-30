@@ -65,7 +65,7 @@ public class atm implements CommandExecutor, TabCompleter {
                     return true;
                 }
                 //money,amountが1以上か
-                if (money <= 1 || amount <= 1){
+                if (money < 1 || amount < 1){
                     e.sendMessage(prefix + "金額と個数は1以上で入力してください");
                     return true;
                 }

@@ -57,12 +57,12 @@ public final class Bank_Plugin2 extends JavaPlugin {
         getCommand("withdraw").setExecutor(new withdraw());
         getCommand("bank").setExecutor(new bank());
         getCommand("pay").setExecutor(new pay());
-        getCommand("lendmoney").setExecutor(new lendmoney());
+        //getCommand("lendmoney").setExecutor(new lendmoney());
         //リスナーを登録
         getServer().getPluginManager().registerEvents(new atm_close(), this);
         getServer().getPluginManager().registerEvents(new atm_select(), this);
         getServer().getPluginManager().registerEvents(new atm_out(), this);
-        getServer().getPluginManager().registerEvents(new lend_collect(), this);
+        //getServer().getPluginManager().registerEvents(new lend_collect(), this);
         //テーブルを作成
         new Thread(()->{
             Connection con = null;
