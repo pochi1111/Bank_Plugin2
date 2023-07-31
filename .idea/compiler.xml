@@ -9,8 +9,5 @@
         <module name="Bank_Plugin2" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="Bank_Plugin2" target="1.8" />
-    </bytecodeTargetLevel>
   </component>
 </project>

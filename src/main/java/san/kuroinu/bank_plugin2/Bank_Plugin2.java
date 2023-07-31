@@ -116,10 +116,13 @@ public final class Bank_Plugin2 extends JavaPlugin {
     }
 
     public static void db_config_relaod(){
-        HikariConfig conf = new HikariConfig();
-        conf.setJdbcUrl(plugin.getConfig().getString("mysql.url"));
-        conf.setUsername(plugin.getConfig().getString("mysql.user"));
-        conf.setPassword(plugin.getConfig().getString("mysql.password"));
-        ds = new HikariDataSource(conf);
+        new Thread (()->{
+                if (ds != null) ds.close();
+                HikariConfig conf = new HikariConfig();
+                conf.setJdbcUrl(plugin.getConfig().getString("mysql.url"));
+                conf.setUsername(plugin.getConfig().getString("mysql.user"));
+                conf.setPassword(plugin.getConfig().getString("mysql.password"));
+                ds = new HikariDataSource(conf);
+        }).start();
     }
 }
