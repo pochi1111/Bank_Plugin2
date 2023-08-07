@@ -18,6 +18,13 @@ public class Bank_Controll {
         Thread t;
         t = new Thread(()->{
             try {
+                if (ds == null){
+                    //PLを再起
+                    plugin.getServer().getConsoleSender().sendMessage(prefix+ChatColor.RED+"データベースに接続できませんでした。再起動します");
+                    //plugman reload Bank_Plugin2を実行
+                    plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), "plugman reload Bank_Plugin2");
+                    return;
+                }
                 Connection con = ds.getConnection();
                 plugin.getServer().getConsoleSender().sendMessage(prefix+ChatColor.YELLOW+e.getName()+"の銀行残高を取得します");
                 PreparedStatement ps = con.prepareStatement("SELECT * FROM db_money WHERE uuid = '"+e.getUniqueId()+"'");

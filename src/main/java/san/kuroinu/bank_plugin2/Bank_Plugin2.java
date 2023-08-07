@@ -42,7 +42,6 @@ public final class Bank_Plugin2 extends JavaPlugin {
         plugin.saveDefaultConfig();
         money_key = new NamespacedKey(plugin,"money");
         lend_key = new NamespacedKey(plugin,"lend");
-        super.onEnable();
         // vaultの導入確認
         if (!setupEconomy() ) {
             getServer().getConsoleSender().sendMessage("Vaultが導入されていません");
@@ -82,11 +81,11 @@ public final class Bank_Plugin2 extends JavaPlugin {
                     con.prepareStatement("create table debt_db(id int auto_increment primary key,debt_amount int  null,lender_uuid text null comment '貸す人のuuid',debtor_uuid text null comment '借りる人のuuid',debt_term date null);").executeUpdate();
                 }
                 con.close();
+                super.onEnable();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
         }).start();
-
     }
 
     private static Boolean setupEconomy() {
@@ -104,7 +103,9 @@ public final class Bank_Plugin2 extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
-        ds.close();
+        if (ds != null){
+            ds.close();
+        }
         super.onDisable();
     }
 
