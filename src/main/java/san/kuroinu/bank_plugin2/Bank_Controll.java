@@ -1,5 +1,7 @@
 package san.kuroinu.bank_plugin2;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import net.milkbowl.vault.chat.Chat;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -11,20 +13,13 @@ import java.sql.ResultSet;
 
 import static san.kuroinu.bank_plugin2.Bank_Plugin2.*;
 
-public class Bank_Controll {
+public class Bank_Controll{
     public OfflinePlayer e;
     private static int balance;
     public int bank_balance(){
         Thread t;
         t = new Thread(()->{
             try {
-                if (ds == null){
-                    //PLを再起
-                    plugin.getServer().getConsoleSender().sendMessage(prefix+ChatColor.RED+"データベースに接続できませんでした。再起動します");
-                    //plugman reload Bank_Plugin2を実行
-                    plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), "plugman reload Bank_Plugin2");
-                    return;
-                }
                 Connection con = ds.getConnection();
                 plugin.getServer().getConsoleSender().sendMessage(prefix+ChatColor.YELLOW+e.getName()+"の銀行残高を取得します");
                 PreparedStatement ps = con.prepareStatement("SELECT * FROM db_money WHERE uuid = '"+e.getUniqueId()+"'");
@@ -41,6 +36,7 @@ public class Bank_Controll {
                 ps.close();
                 con.close();
             } catch (Exception e) {
+                db_config_relaod();
                 throw new RuntimeException(e);
             }
         });
@@ -60,6 +56,7 @@ public class Bank_Controll {
                 con.prepareStatement("insert into db_money (uuid, money) values ('"+e.getUniqueId()+"', 0)").executeUpdate();
                 con.close();
             } catch (Exception e) {
+                db_config_relaod();
                 throw new RuntimeException(e);
             }
         }).start();
@@ -75,6 +72,7 @@ public class Bank_Controll {
                 con.close();
                 if (e.isOnline()) e.getPlayer().sendMessage(prefix+ ChatColor.YELLOW +amount+"円が銀行に入金されました!");
             } catch (Exception e) {
+                db_config_relaod();
                 throw new RuntimeException(e);
             }
         }).start();
@@ -93,10 +91,34 @@ public class Bank_Controll {
                     con.prepareStatement("update db_money set money = "+now_money+" where uuid = '"+e.getUniqueId()+"'").executeUpdate();
                     con.close();
                 } catch (Exception e) {
+                    db_config_relaod();
                     throw new RuntimeException(e);
                 }
             }).start();
             return true;
         }
+    }
+
+    public void db_config_relaod(){
+        Thread t;
+        plugin.getServer().broadcastMessage(prefix+ChatColor.RED+"データベースに接続できませんでした。再接続を試みます。");
+        plugin.getServer().broadcastMessage(prefix+ChatColor.RED+"再接続が終了するまで、bankを利用しないでください");
+        //logに流す
+        plugin.getServer().getConsoleSender().sendMessage(prefix+ChatColor.RED+"データベースに接続できませんでした。再接続を試みます。");
+        t = new Thread (()->{
+            if (ds != null) ds.close();
+            HikariConfig conf = new HikariConfig();
+            conf.setJdbcUrl(plugin.getConfig().getString("mysql.url"));
+            conf.setUsername(plugin.getConfig().getString("mysql.user"));
+            conf.setPassword(plugin.getConfig().getString("mysql.password"));
+            ds = new HikariDataSource(conf);
+        });
+        try {
+            t.join();
+            plugin.getServer().broadcastMessage(prefix+ChatColor.GREEN+"データベースに接続しました。");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return;
     }
 }

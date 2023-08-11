@@ -4,6 +4,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import jdk.internal.net.http.common.Pair;
 import net.milkbowl.vault.economy.Economy;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
@@ -61,7 +62,6 @@ public final class Bank_Plugin2 extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new atm_out(), this);
         //getServer().getPluginManager().registerEvents(new lend_collect(), this);
         //テーブルを作成
-        new Thread(()->{
             // mysqlの設定
             HikariConfig conf = new HikariConfig();
             conf.setJdbcUrl(plugin.getConfig().getString("mysql.url"));
@@ -83,9 +83,9 @@ public final class Bank_Plugin2 extends JavaPlugin {
                 con.close();
                 super.onEnable();
             } catch (SQLException e) {
+                db_config_relaod();
                 throw new RuntimeException(e);
             }
-        }).start();
     }
 
     private static Boolean setupEconomy() {
@@ -121,6 +121,10 @@ public final class Bank_Plugin2 extends JavaPlugin {
     }
 
     public static void db_config_relaod(){
+        plugin.getServer().broadcastMessage(prefix+ ChatColor.RED+"データベースに接続できませんでした。再接続を試みます。");
+        plugin.getServer().broadcastMessage(prefix+ChatColor.RED+"再接続が終了するまで、bankを利用しないでください");
+        //logに流す
+        plugin.getServer().getConsoleSender().sendMessage(prefix+ChatColor.RED+"データベースに接続できませんでした。再接続を試みます。");
         Thread t;
         t = new Thread (()->{
                 if (ds != null) ds.close();
